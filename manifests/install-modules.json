@@ -641,7 +641,7 @@
     {
       "id": "ito-compute",
       "kind": "skills",
-      "description": "Authenticated It\u00f4 GPU inventory, RFQ, status, device revocation, and explicitly gated node-qualification workflows through the separately installed canonical CLI.",
+      "description": "Authenticated Itô GPU inventory, RFQ, status, device revocation, and explicitly gated node-qualification workflows through the separately installed canonical CLI.",
       "paths": [
         "skills/ito-compute",
         "skills/ito-inference",
@@ -1177,6 +1177,38 @@
       "defaultInstall": false,
       "cost": "heavy",
       "stability": "stable"
+    },
+    {
+      "id": "mclain-systems",
+      "kind": "skills",
+      "description": "McLain Systems execution layer: leverage-first system design, project command-center control, and the mobile operator console.",
+      "paths": [
+        "skills/mclain-systems-builder",
+        "skills/mclain-project-command-center",
+        "commands/mclain-build.md",
+        "commands/mclain-control.md",
+        "mclain-app"
+      ],
+      "targets": [
+        "claude",
+        "claude-project",
+        "cursor",
+        "antigravity",
+        "codex",
+        "opencode",
+        "codebuddy",
+        "joycode",
+        "qwen",
+        "zed"
+      ],
+      "dependencies": [
+        "workflow-quality",
+        "research-apis",
+        "operator-workflows"
+      ],
+      "defaultInstall": false,
+      "cost": "medium",
+      "stability": "beta"
     }
   ]
 }
