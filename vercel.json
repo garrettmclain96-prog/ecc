@@ -3,7 +3,7 @@
   "functions": {
     "api/run.js": {
       "maxDuration": 60,
-      "includeFiles": "{scripts/**,manifests/**,commands/**,skills/**,docs/COMMAND-REGISTRY.json,docs/zh-CN/**,.claude-plugin/**,AGENTS.md,README.md,README.zh-CN.md,package.json}"
+      "includeFiles": "{api/**,scripts/**,manifests/**,commands/**,skills/**,agents/**,mclain-app/**,docs/COMMAND-REGISTRY.json,docs/zh-CN/**,.claude-plugin/**,AGENTS.md,README.md,README.zh-CN.md,package.json,vercel.json}"
     },
     "api/status.js": {
       "includeFiles": "{manifests/**,commands/**,skills/**,package.json}"
