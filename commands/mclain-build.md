@@ -5,6 +5,8 @@ argument-hint: "[idea | problem | project | feature]"
 
 # McLain Build
 
+Source skill: `skills/mclain-systems-builder/SKILL.md`
+
 Use the `mclain-systems-builder` skill.
 
 Do not stop at advice. Move the request toward a durable asset.
