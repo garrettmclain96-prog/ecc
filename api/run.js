@@ -9,7 +9,7 @@ const RUNNERS = {
   'command-registry-check': ['scripts/ci/generate-command-registry.js', '--check'],
   'skills-health': ['scripts/skills-health.js'],
   'harness-audit': ['scripts/harness-audit.js'],
-  'platform-audit': ['scripts/platform-audit.js'],
+  'platform-audit': ['scripts/mclain-hosted-audit.js'],
   'doctor': ['scripts/doctor.js']
 };
 
