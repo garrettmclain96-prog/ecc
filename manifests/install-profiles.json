@@ -101,6 +101,26 @@
         "supply-chain-domain",
         "document-processing"
       ]
+    },
+    "mclain": {
+      "description": "McLain Systems operator profile for building, researching, automating, shipping, and controlling durable projects from an execution-first workflow.",
+      "modules": [
+        "rules-core",
+        "agents-core",
+        "commands-core",
+        "hooks-runtime",
+        "platform-configs",
+        "workflow-quality",
+        "framework-language",
+        "database",
+        "security",
+        "research-apis",
+        "business-content",
+        "operator-workflows",
+        "optimization-workflows",
+        "orchestration",
+        "mclain-systems"
+      ]
     }
   }
 }
