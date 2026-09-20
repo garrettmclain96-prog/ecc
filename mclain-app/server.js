@@ -17,7 +17,7 @@ const RUNNERS = {
   'command-registry-check': ['scripts/ci/generate-command-registry.js', '--check'],
   'skills-health': ['scripts/skills-health.js'],
   'harness-audit': ['scripts/harness-audit.js'],
-  'platform-audit': ['scripts/platform-audit.js'],
+  'platform-audit': ['scripts/mclain-hosted-audit.js'],
   'doctor': ['scripts/doctor.js']
 };
 
@@ -232,7 +232,7 @@ const server = http.createServer(async (req, res) => {
       const pkg = readJson('package.json');
       const profiles = readJson('manifests/install-profiles.json');
       return sendJson(res, 200, {
-        app: 'McLain Systems Console',
+        app: 'McLain Systems OS',
         repository: pkg.name,
         version: pkg.version,
         node: process.version,
@@ -277,5 +277,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`McLain Systems Console running on http://0.0.0.0:${PORT}`);
+  console.log(`McLain Systems OS running on http://0.0.0.0:${PORT}`);
 });

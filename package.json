@@ -500,7 +500,8 @@
     "prepack": "npm run build:opencode",
     "dashboard": "python3 ./ecc_dashboard.py",
     "dashboard:web": "node scripts/dashboard-web.js",
-    "mclain:app": "node mclain-app/server.js"
+    "mclain:app": "node mclain-app/server.js",
+    "mclain:os:test": "node tests/mclain-os-core.test.js"
   },
   "dependencies": {
     "@iarna/toml": "2.2.5",

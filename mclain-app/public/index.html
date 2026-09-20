@@ -1,46 +1,145 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0a0d12">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="McLain Systems">
-<title>McLain Systems Console</title>
-<link rel="manifest" href="/manifest.webmanifest">
-<link rel="icon" href="/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/icon.svg">
-<style>
-:root{color-scheme:dark;--bg:#07090d;--card:#111720;--text:#f7f9fc;--muted:#94a0af;--line:#273140;--accent:#d6ff45;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#182130 0,var(--bg) 34rem);color:var(--text);min-height:100vh}button,input,textarea,select{font:inherit}.shell{width:min(760px,100%);margin:auto;padding:calc(env(safe-area-inset-top) + 18px) 16px calc(env(safe-area-inset-bottom) + 34px)}.topbar,.row{display:flex;align-items:center}.topbar{justify-content:space-between;gap:12px}.eyebrow,.kicker{margin:0 0 4px;font-size:12px;letter-spacing:.14em;color:var(--accent);font-weight:800}h1{margin:0;font-size:24px}h2{margin:6px 0 10px;font-size:28px;line-height:1.02}h3{margin:0 0 10px;font-size:18px}.muted{color:var(--muted);line-height:1.45}.badge{border:1px solid #41502a;background:#1d2714;color:var(--accent);padding:8px 10px;border-radius:999px;font-size:12px;font-weight:800;text-transform:uppercase}.badge.offline{border-color:#5a3333;background:#251616;color:#ff8d8d}.card{background:linear-gradient(180deg,rgba(21,28,38,.96),rgba(14,19,27,.96));border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:14px;box-shadow:0 12px 40px rgba(0,0,0,.22)}.hero{padding:22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}.stats div{background:#0b1016;border:1px solid #202a38;border-radius:14px;padding:12px;min-width:0}.stats strong{display:block;font-size:19px;color:var(--accent);overflow:hidden;text-overflow:ellipsis}.stats span{display:block;font-size:11px;color:var(--muted);margin-top:4px}.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;padding:5px;background:#0c1118;border:1px solid var(--line);border-radius:15px;position:sticky;top:calc(env(safe-area-inset-top) + 8px);z-index:5;backdrop-filter:blur(16px)}.tab{min-height:44px;border:0;border-radius:11px;background:transparent;color:var(--muted);font-weight:800}.tab.active{background:var(--accent);color:#111508}.panel{display:none}.panel.active{display:block}.runner-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.runner{min-height:92px;text-align:left;border:1px solid #2b3747;border-radius:16px;background:#0d131a;color:var(--text);padding:14px}.runner:disabled{opacity:.55}.runner strong{display:block;font-size:15px}.runner span{display:block;color:var(--muted);font-size:12px;line-height:1.35;margin-top:5px}.output pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;max-height:52vh;overflow:auto;background:#080c11;border:1px solid #202a38;padding:14px;border-radius:14px;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}.between{display:flex;align-items:center;justify-content:space-between;gap:12px}.ghost,.primary{border:0;border-radius:12px;min-height:44px;padding:0 14px;font-weight:800}.ghost{background:#202a38;color:var(--text)}.primary{width:100%;background:var(--accent);color:#111508;margin-top:4px}label{display:grid;gap:7px;margin-top:13px;color:#dfe6ef;font-size:13px;font-weight:700}input,textarea,select{width:100%;border:1px solid #2b3747;border-radius:13px;background:#0b1016;color:var(--text);padding:13px;outline:none}textarea{resize:vertical}.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid #354255;background:#0b1016;padding:8px 10px;border-radius:999px;color:#cbd5e1;font-size:12px}footer{display:flex;justify-content:space-between;color:#657182;font-size:11px;padding:18px 2px 0}@media(max-width:390px){h2{font-size:25px}.runner-grid{grid-template-columns:1fr}.stats{gap:6px}.stats div{padding:10px}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#080b10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="McLain OS">
+  <meta name="description" content="The iPhone-first command center for McLain Systems projects, proof, blockers, and execution.">
+  <title>McLain Systems OS</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<main class="shell">
-<header class="topbar"><div><p class="eyebrow">MCLAIN SYSTEMS</p><h1>Operator Console</h1></div><span id="net" class="badge">checking</span></header>
-<section class="hero card"><p class="kicker">ECC + YOUR OPERATING LAYER</p><h2>Build systems. Run checks. Generate execution packets.</h2><p class="muted">Designed for iPhone first. Install from Safari with Add to Home Screen.</p><div class="stats"><div><strong id="skills">—</strong><span>skills</span></div><div><strong id="commands">—</strong><span>commands</span></div><div><strong id="profile">—</strong><span>mclain profile</span></div></div></section>
-<nav class="tabs"><button class="tab active" data-panel="run">Run</button><button class="tab" data-panel="packets">Packets</button><button class="tab" data-panel="profilePanel">Profile</button></nav>
-<section id="run" class="panel active"><div class="card"><h3>Safe command runner</h3><p class="muted">Only explicit allowlisted ECC diagnostics can run from the phone.</p><div id="runners" class="runner-grid"></div></div><div class="card output"><div class="between"><h3>Output</h3><button id="clear" class="ghost">Clear</button></div><pre id="out">Ready.</pre></div></section>
-<section id="packets" class="panel"><div class="card"><h3>Execution packet generator</h3><label>Workflow<select id="workflow"><option value="build">Build system</option><option value="control">Project control</option><option value="research">Evidence research</option></select></label><label>Project<input id="project" placeholder="OpsPost, ParcelForge, Family Land…"></label><label>Goal<textarea id="goal" rows="3" placeholder="What must be true when this is finished?"></textarea></label><label>Context<textarea id="context" rows="5" placeholder="Known facts, constraints, links, current state"></textarea></label><button id="generate" class="primary">Generate packet</button></div><div class="card output"><div class="between"><h3>Generated markdown</h3><button id="download" class="ghost" disabled>Save .md</button></div><pre id="packet">No packet yet.</pre></div></section>
-<section id="profilePanel" class="panel"><div class="card"><h3>McLain profile</h3><p class="muted">Your tailored ECC install surface.</p><div id="modules" class="chips"></div></div><div class="card"><h3>Operating principle</h3><p>Turn one-time work into reusable assets. Turn recurring work into automation. Keep the source of truth under your control.</p></div></section>
-<footer><span>McLain Systems Console</span><span id="version"></span></footer>
-</main>
-<script>
-'use strict';
-const $=id=>document.getElementById(id);
-const defs=[['doctor','Doctor','Environment and configuration health'],['catalog-check','Catalog','Validate the ECC catalog'],['command-registry-check','Commands','Validate the command registry'],['skills-health','Skills','Run skill health checks'],['harness-audit','Harness','Audit harness compatibility'],['platform-audit','Hosted','Verify the live McLain/Vercel control plane']];
-let markdown='';
-function net(){const on=navigator.onLine;$('net').textContent=on?'online':'offline';$('net').classList.toggle('offline',!on)}addEventListener('online',net);addEventListener('offline',net);net();
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.panel).classList.add('active')});
-async function run(key,b){if(!navigator.onLine){$('out').textContent='Offline: command execution requires the server.';return}const old=b.innerHTML;b.disabled=true;b.textContent='Running…';$('out').textContent='Running '+key+'…';try{const r=await fetch('/api/run',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({command:key})});const d=await r.json();$('out').textContent=[`command: ${key}`,`ok: ${!!d.ok}`,d.exitCode!==undefined?`exit: ${d.exitCode}`:'','',d.stdout||'',d.stderr?`STDERR\n${d.stderr}`:'',d.error?`ERROR\n${d.error}`:''].filter(Boolean).join('\n')}catch(e){$('out').textContent='Request failed: '+e.message}finally{b.disabled=false;b.innerHTML=old}}
-defs.forEach(([key,title,desc])=>{const b=document.createElement('button');b.className='runner';b.innerHTML=`<strong>${title}</strong><span>${desc}</span>`;b.onclick=()=>run(key,b);$('runners').appendChild(b)});
-$('clear').onclick=()=>$('out').textContent='Ready.';
-async function load(){try{const [a,b]=await Promise.all([fetch('/api/status'),fetch('/api/profile')]);const s=await a.json(),p=await b.json();$('skills').textContent=s.counts?.skills??'—';$('commands').textContent=s.counts?.commands??'—';$('profile').textContent=s.profileAvailable?'ready':'missing';$('version').textContent='ECC '+(s.version||'');$('modules').innerHTML=(p.profile?.modules||[]).map(x=>`<span class="chip">${x}</span>`).join('')}catch{$('profile').textContent='offline'}}load();
-$('generate').onclick=async()=>{const data={workflow:$('workflow').value,project:$('project').value,goal:$('goal').value,context:$('context').value};localStorage.setItem('mclain:lastPacketInput',JSON.stringify(data));$('packet').textContent='Generating…';try{const r=await fetch('/api/packet',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(data)});const d=await r.json();markdown=d.markdown||'';$('packet').textContent=markdown||'No packet returned.';$('download').disabled=!markdown}catch(e){$('packet').textContent='Generation failed: '+e.message}};
-$('download').onclick=()=>{if(!markdown)return;const slug=($('project').value||'mclain-packet').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');const blob=new Blob([markdown],{type:'text/markdown;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(slug||'mclain-packet')+'.md';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
-try{const s=JSON.parse(localStorage.getItem('mclain:lastPacketInput')||'null');if(s){$('workflow').value=s.workflow||'build';$('project').value=s.project||'';$('goal').value=s.goal||'';$('context').value=s.context||''}}catch{}
-if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
-</script>
+  <div class="app-shell">
+    <header class="app-header">
+      <button class="brand" data-view="home" aria-label="Open command center">
+        <span class="brand-mark">M</span>
+        <span><strong>McLain Systems</strong><small>OPERATING SYSTEM</small></span>
+      </button>
+      <div class="header-actions">
+        <span id="networkBadge" class="network-badge"><i></i><span>online</span></span>
+        <button class="icon-button" id="quickAdd" aria-label="Create project">+</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="homeView" class="view active" aria-labelledby="homeTitle">
+        <div class="view-heading">
+          <p class="overline" id="todayLabel"></p>
+          <h1 id="homeTitle">Command center</h1>
+          <p>One source of truth for what matters, what is stuck, and what moves next.</p>
+        </div>
+        <div id="portfolioStats" class="metric-grid"></div>
+        <section id="focusCard" class="focus-card"></section>
+        <div class="section-title"><div><p class="overline">PORTFOLIO PRESSURE</p><h2>Needs your attention</h2></div><button class="text-button" data-view="projects">View all</button></div>
+        <div id="attentionList" class="project-list"></div>
+        <div class="section-title"><div><p class="overline">EXECUTION QUEUE</p><h2>Next actions</h2></div></div>
+        <div id="actionQueue" class="action-queue"></div>
+      </section>
+
+      <section id="projectsView" class="view" aria-labelledby="projectsTitle">
+        <div class="view-heading compact-heading">
+          <p class="overline">PORTFOLIO</p>
+          <h1 id="projectsTitle">Projects</h1>
+          <p>Every active bet, ordered by pressure and leverage.</p>
+        </div>
+        <div class="project-controls">
+          <label class="search-box"><span>⌕</span><input id="projectSearch" type="search" placeholder="Search projects" autocomplete="off"></label>
+          <select id="projectFilter" aria-label="Filter projects">
+            <option value="all">All status</option><option value="active">Active</option><option value="shipping">Shipping</option>
+            <option value="blocked">Blocked</option><option value="waiting">Waiting</option><option value="parked">Parked</option>
+          </select>
+        </div>
+        <div id="projectGrid" class="project-grid"></div>
+      </section>
+
+      <section id="captureView" class="view" aria-labelledby="captureTitle">
+        <div class="view-heading compact-heading">
+          <p class="overline">INBOX → SYSTEM</p>
+          <h1 id="captureTitle">Capture it once</h1>
+          <p>Turn a loose idea, problem, or opportunity into an owned project with an execution path.</p>
+        </div>
+        <form id="captureForm" class="surface form-surface">
+          <label>What is it?<input id="captureName" required maxlength="120" placeholder="A product, problem, opportunity…"></label>
+          <label>What must become true?<textarea id="captureOutcome" required maxlength="1200" rows="4" placeholder="Describe the finished outcome, not the activity"></textarea></label>
+          <div class="split-fields">
+            <label>Priority<select id="capturePriority"><option value="critical">Critical</option><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option></select></label>
+            <label>Category<input id="captureCategory" maxlength="80" value="New venture"></label>
+          </div>
+          <label>Known constraint or blocker<input id="captureBlocker" maxlength="300" placeholder="Optional"></label>
+          <button class="primary-button" type="submit">Create the system <span>→</span></button>
+        </form>
+        <section class="surface leverage-map">
+          <p class="overline">MCLAIN BUILD STANDARD</p>
+          <h2>Every idea must earn its place.</h2>
+          <div class="principles">
+            <div><b>01</b><span><strong>Outcome</strong><small>What changes when this works?</small></span></div>
+            <div><b>02</b><span><strong>Proof</strong><small>How will we know it is real?</small></span></div>
+            <div><b>03</b><span><strong>System</strong><small>What makes the result repeatable?</small></span></div>
+            <div><b>04</b><span><strong>Leverage</strong><small>Can it scale without your hours?</small></span></div>
+          </div>
+        </section>
+      </section>
+
+      <section id="systemView" class="view" aria-labelledby="systemTitle">
+        <div class="view-heading compact-heading">
+          <p class="overline">CONTROL PLANE</p>
+          <h1 id="systemTitle">System</h1>
+          <p>Deployment health, ECC diagnostics, and ownership of your data.</p>
+        </div>
+        <section class="surface system-health">
+          <div class="section-row"><div><p class="overline">LIVE STATUS</p><h2>McLain control plane</h2></div><span id="systemState" class="state-pill">checking</span></div>
+          <div id="systemMetrics" class="system-metrics"><span>Loading runtime status…</span></div>
+        </section>
+        <section class="surface">
+          <div class="section-row"><div><p class="overline">SAFE DIAGNOSTICS</p><h2>ECC engine</h2></div></div>
+          <p class="surface-copy">These checks verify the machinery behind this OS. They are support tools—not the main product.</p>
+          <div id="diagnosticButtons" class="diagnostic-grid"></div>
+          <pre id="diagnosticOutput" class="diagnostic-output">No diagnostic running.</pre>
+        </section>
+        <section class="surface">
+          <p class="overline">DATA OWNERSHIP</p><h2>Your records stay portable</h2>
+          <p class="surface-copy">This version saves on this iPhone. Export a backup before clearing Safari data or changing devices.</p>
+          <div class="button-row"><button id="exportData" class="secondary-button">Export backup</button><button id="importData" class="secondary-button">Import backup</button></div>
+          <input id="importFile" type="file" accept="application/json,.json" hidden>
+        </section>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Primary navigation">
+      <button class="nav-button active" data-view="home"><span>⌂</span><small>Home</small></button>
+      <button class="nav-button" data-view="projects"><span>▦</span><small>Projects</small></button>
+      <button class="nav-button capture-nav" data-view="capture"><span>+</span><small>Capture</small></button>
+      <button class="nav-button" data-view="system"><span>⌁</span><small>System</small></button>
+    </nav>
+  </div>
+
+  <div id="projectSheet" class="sheet-backdrop" hidden>
+    <article class="project-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-handle"></div>
+      <button id="closeSheet" class="sheet-close" aria-label="Close project">×</button>
+      <div id="sheetContent"></div>
+    </article>
+  </div>
+
+  <div id="projectDialog" class="sheet-backdrop" hidden>
+    <form id="projectForm" class="project-sheet compact-sheet" role="dialog" aria-modal="true" aria-labelledby="projectFormTitle">
+      <div class="sheet-handle"></div><button type="button" class="sheet-close" data-close-dialog>×</button>
+      <p class="overline">NEW OWNED ASSET</p><h2 id="projectFormTitle">Create project</h2>
+      <label>Name<input id="projectName" required maxlength="120"></label>
+      <label>Finished outcome<textarea id="projectOutcome" required rows="4" maxlength="1200"></textarea></label>
+      <div class="split-fields"><label>Priority<select id="projectPriority"><option>critical</option><option selected>high</option><option>medium</option><option>low</option></select></label><label>Category<input id="projectCategory" value="General" maxlength="80"></label></div>
+      <button class="primary-button" type="submit">Create project <span>→</span></button>
+    </form>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/core.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>

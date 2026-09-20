@@ -22,6 +22,18 @@
       "destination": "/mclain-app/public/manifest.webmanifest"
     },
     {
+      "source": "/styles.css",
+      "destination": "/mclain-app/public/styles.css"
+    },
+    {
+      "source": "/core.js",
+      "destination": "/mclain-app/public/core.js"
+    },
+    {
+      "source": "/app.js",
+      "destination": "/mclain-app/public/app.js"
+    },
+    {
       "source": "/sw.js",
       "destination": "/mclain-app/public/sw.js"
     },

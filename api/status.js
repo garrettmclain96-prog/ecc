@@ -19,7 +19,7 @@ module.exports = function handler(req, res) {
   const profiles = readJson('manifests/install-profiles.json');
   res.setHeader('Cache-Control', 'no-store');
   return res.status(200).json({
-    app: 'McLain Systems Console',
+    app: 'McLain Systems OS',
     repository: pkg.name,
     version: pkg.version,
     node: process.version,
