@@ -1,0 +1,17 @@
+{
+  "name": "McLain Systems Console",
+  "short_name": "McLain Systems",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090d",
+  "theme_color": "#0a0d12",
+  "description": "iPhone-first operator console for the McLain Systems ECC layer.",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

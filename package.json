@@ -455,7 +455,10 @@
     "!**/*.pyc",
     "!**/*.pyo",
     "!**/*.pyd",
-    "!**/.pytest_cache/**"
+    "!**/.pytest_cache/**",
+    "mclain-app/",
+    "skills/mclain-systems-builder/",
+    "skills/mclain-project-command-center/"
   ],
   "bin": {
     "ecc": "scripts/ecc.js",
@@ -496,7 +499,8 @@
     "build:opencode": "node scripts/build-opencode.js",
     "prepack": "npm run build:opencode",
     "dashboard": "python3 ./ecc_dashboard.py",
-    "dashboard:web": "node scripts/dashboard-web.js"
+    "dashboard:web": "node scripts/dashboard-web.js",
+    "mclain:app": "node mclain-app/server.js"
   },
   "dependencies": {
     "@iarna/toml": "2.2.5",
