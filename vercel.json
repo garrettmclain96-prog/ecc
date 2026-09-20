@@ -3,45 +3,41 @@
   "functions": {
     "api/run.js": {
       "maxDuration": 60,
-      "includeFiles": [
-        "scripts/**",
-        "manifests/**",
-        "commands/**",
-        "skills/**",
-        "docs/COMMAND-REGISTRY.json",
-        "docs/zh-CN/**",
-        ".claude-plugin/**",
-        "AGENTS.md",
-        "README.md",
-        "README.zh-CN.md",
-        "package.json"
-      ]
+      "includeFiles": "{scripts/**,manifests/**,commands/**,skills/**,docs/COMMAND-REGISTRY.json,docs/zh-CN/**,.claude-plugin/**,AGENTS.md,README.md,README.zh-CN.md,package.json}"
     },
     "api/status.js": {
-      "includeFiles": [
-        "manifests/**",
-        "commands/**",
-        "skills/**",
-        "package.json"
-      ]
+      "includeFiles": "{manifests/**,commands/**,skills/**,package.json}"
     },
     "api/profile.js": {
-      "includeFiles": [
-        "manifests/**"
-      ]
+      "includeFiles": "manifests/**"
     }
   },
   "rewrites": [
-    { "source": "/", "destination": "/mclain-app/public/index.html" },
-    { "source": "/manifest.webmanifest", "destination": "/mclain-app/public/manifest.webmanifest" },
-    { "source": "/sw.js", "destination": "/mclain-app/public/sw.js" },
-    { "source": "/icon.svg", "destination": "/mclain-app/public/icon.svg" }
+    {
+      "source": "/",
+      "destination": "/mclain-app/public/index.html"
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "destination": "/mclain-app/public/manifest.webmanifest"
+    },
+    {
+      "source": "/sw.js",
+      "destination": "/mclain-app/public/sw.js"
+    },
+    {
+      "source": "/icon.svg",
+      "destination": "/mclain-app/public/icon.svg"
+    }
   ],
   "headers": [
     {
       "source": "/sw.js",
       "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
       ]
     }
   ]
