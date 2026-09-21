@@ -4,3 +4,5 @@
 @media(max-width:370px){.view,.app-header{padding-left:13px;padding-right:13px}.split-fields,.principles,.edit-row{grid-template-columns:1fr}.network-badge span{display:none}}
 @media(min-width:760px){.app-shell{border-left:1px solid rgba(39,48,62,.4);border-right:1px solid rgba(39,48,62,.4)}.view{padding:24px 28px}.app-header{padding-left:28px;padding-right:28px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+.capability-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:15px}.capability-card{display:block;border:1px solid var(--line);border-radius:15px;background:#0b0f15;padding:13px;text-decoration:none}.capability-card strong{font-size:14px}.capability-card>small{display:block;color:var(--accent);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-top:9px}.capability-card p{color:var(--muted);font-size:12px;line-height:1.45;margin:7px 0 0}@media(max-width:560px){.capability-grid{grid-template-columns:1fr}}
