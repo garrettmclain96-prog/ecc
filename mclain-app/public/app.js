@@ -3,6 +3,9 @@
 
   const Core = window.McLainCore;
   const STORAGE_KEY = 'mclain:os:v2';
+  const OPS_STORAGE_KEY = 'mclain:ops:v1';
+  const OPS_SESSION_KEY = 'mclain:ops:session:v1';
+  const opsConfig = window.McLainOpsConfig;
   const $ = id => document.getElementById(id);
   const escapeHtml = value => String(value == null ? '' : value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
   const titleCase = value => String(value).replace(/(^|[-_ ])\w/g, match => match.toUpperCase());
@@ -13,6 +16,11 @@
   ];
 
   let state = loadState();
+  let opsState = loadOpsState();
+  let opsSession = null;
+  try { opsSession = JSON.parse(localStorage.getItem(OPS_SESSION_KEY) || 'null'); } catch { localStorage.removeItem(OPS_SESSION_KEY); }
+  let sharedOrders = [];
+  let opsMember = false;
   let activeProjectId = null;
   let toastTimer;
 
@@ -22,6 +30,28 @@
       return saved ? Core.importState(saved) : Core.createInitialState();
     } catch {
       return Core.createInitialState();
+    }
+  }
+
+  function loadOpsState() {
+    try {
+      const saved = localStorage.getItem(OPS_STORAGE_KEY);
+      const parsed = saved ? JSON.parse(saved) : { workOrders: [] };
+      return { workOrders: Array.isArray(parsed.workOrders) ? parsed.workOrders : [] };
+    } catch {
+      return { workOrders: [] };
+    }
+  }
+
+  function saveOpsState(message) {
+    try {
+      localStorage.setItem(OPS_STORAGE_KEY, JSON.stringify(opsState));
+      renderOpsWorkOrders();
+      if (message) toast(message);
+      return true;
+    } catch {
+      toast('Device storage is full. Export a backup before adding more records.');
+      return false;
     }
   }
 
@@ -53,6 +83,7 @@
   function renderAll() {
     renderHome();
     renderProjects();
+    renderOpsWorkOrders();
   }
 
   function renderHome() {
@@ -95,6 +126,124 @@
         <h3>${escapeHtml(project.name)}</h3><p>${escapeHtml(project.outcome)}</p>
         <div class="project-meta"><span>${escapeHtml(project.category)}</span><span>${openActions(project).length} next · ${project.evidence.length} proof</span></div>
       </button>`).join('') : '<div class="empty-state">No projects match this view.</div>';
+  }
+
+  function renderOpsWorkOrders() {
+    const target = $('opsWorkOrderList');
+    if (!target) return;
+    if (!opsMember) {
+      target.innerHTML = '<div class="empty-state">Sign in with an approved resort staff account to load the shared queue.</div>';
+      return;
+    }
+    const orders = sharedOrders.slice().sort((a, b) => {
+      if ((a.reviewState === 'done') !== (b.reviewState === 'done')) return a.reviewState === 'done' ? 1 : -1;
+      const priorityRank = { urgent: 0, high: 1, normal: 2, low: 3 };
+      return (priorityRank[a.priority] ?? 2) - (priorityRank[b.priority] ?? 2) || String(b.createdAt).localeCompare(String(a.createdAt));
+    });
+    target.innerHTML = orders.length ? orders.map(order => `
+      <article class="work-order-card ${order.reviewState === 'done' ? 'done' : ''}">
+        <div class="work-order-top">
+          <span class="status-tag">${escapeHtml(order.priority)}</span>
+          <span class="state-pill ${order.reviewState === 'done' ? 'ready' : ''}">${escapeHtml(order.reviewState)}</span>
+        </div>
+        <h3>${escapeHtml(order.title)}</h3>
+        <p>${escapeHtml(order.location || order.site || 'No location logged')}</p>
+        <p>${escapeHtml(order.description || '')}</p>
+        <div class="work-order-meta">
+          <span>${escapeHtml(order.department)}</span>
+          <span>${escapeHtml(order.id)}</span>
+        </div>
+        <div class="work-order-note">${escapeHtml(order.notificationSubject || 'Manager approval draft ready')}<br>Proposed assignee: ${escapeHtml(order.proposedAssignee || 'None')}<br>Resolution evidence: ${escapeHtml(order.resolutionEvidence || 'Not logged')}</div>
+        ${order.reviewState === 'done' ? '' : `<div class="work-order-actions">
+          <button class="secondary-button" type="button" data-claim-work-order="${escapeHtml(order.id)}" ${order.reviewState === 'claimed' ? 'disabled' : ''}>${order.reviewState === 'claimed' ? 'Review claimed' : 'Claim review'}</button>
+          <button class="secondary-button" type="button" data-assign-work-order="${escapeHtml(order.id)}">Propose assignee</button>
+          <button class="secondary-button" type="button" data-log-work-order="${escapeHtml(order.id)}">Record evidence</button>
+          <button class="secondary-button" type="button" data-close-work-order="${escapeHtml(order.id)}" ${order.reviewState !== 'claimed' || !order.resolutionEvidence ? 'disabled' : ''}>Mark resolved</button>
+        </div>`}
+      </article>`).join('') : '<div class="empty-state">The shared queue is empty. Send a front desk issue to create one.</div>';
+  }
+
+  async function opsRequest(path, options = {}, retry = true) {
+    const response = await fetch(`${opsConfig.url}${path}`, {
+      ...options,
+      headers: { apikey: opsConfig.publishableKey, authorization: `Bearer ${opsSession?.access_token || opsConfig.publishableKey}`, 'content-type': 'application/json', ...options.headers }
+    });
+    if (response.status === 401 && retry && opsSession?.refresh_token) {
+      const refreshed = await fetch(`${opsConfig.url}/auth/v1/token?grant_type=refresh_token`, {
+        method: 'POST', headers: { apikey: opsConfig.publishableKey, 'content-type': 'application/json' },
+        body: JSON.stringify({ refresh_token: opsSession.refresh_token })
+      });
+      if (refreshed.ok) {
+        opsSession = await refreshed.json();
+        localStorage.setItem(OPS_SESSION_KEY, JSON.stringify(opsSession));
+        return opsRequest(path, options, false);
+      }
+      signOutOps();
+    }
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.msg || body.message || body.error_description || body.error || `Request failed (${response.status})`);
+    }
+    return response.status === 204 ? null : response.json();
+  }
+
+  function mapSharedOrder(row) {
+    return {
+      id: row.id, dedupeKey: row.dedupe_key, title: row.title, priority: row.priority,
+      department: row.department, location: row.location, description: row.description,
+      notificationSubject: row.notification_subject, reviewState: row.review_state,
+      proposedAssignee: row.proposed_assignee, resolutionEvidence: row.resolution_evidence,
+      createdAt: row.created_at, updatedAt: row.updated_at
+    };
+  }
+
+  async function refreshOps() {
+    if (!opsSession) return;
+    const memberships = await opsRequest(`/rest/v1/site_memberships?site_id=eq.${opsConfig.siteId}&is_active=eq.true&select=id&limit=1`);
+    opsMember = memberships.length > 0;
+    $('opsAuthForm').hidden = true;
+    $('opsMemberActions').hidden = false;
+    $('opsAuthStatus').textContent = opsMember ? 'Signed in. Shared resort queue.' : 'Signed in, waiting for a resort manager to add this account as a site member.';
+    sharedOrders = opsMember ? (await opsRequest(`/rest/v1/ops_work_orders?site_id=eq.${opsConfig.siteId}&select=*&order=created_at.desc&limit=200`)).map(mapSharedOrder) : [];
+    renderOpsWorkOrders();
+  }
+
+  function signOutOps() {
+    opsSession = null;
+    opsMember = false;
+    sharedOrders = [];
+    localStorage.removeItem(OPS_SESSION_KEY);
+    $('opsAuthForm').hidden = false;
+    $('opsMemberActions').hidden = true;
+    $('opsAuthStatus').textContent = 'Signed out.';
+    renderOpsWorkOrders();
+  }
+
+  async function updateSharedOrder(id, patch) {
+    await opsRequest(`/rest/v1/ops_work_orders?id=eq.${encodeURIComponent(id)}&site_id=eq.${opsConfig.siteId}`, {
+      method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ ...patch, updated_at: new Date().toISOString() })
+    }).then(rows => { if (!rows.length) throw new Error('No update allowed. A manager account is required.'); });
+    await refreshOps();
+  }
+
+  async function importLocalOps() {
+    if (!opsMember) return toast('A resort membership is required first');
+    if (!opsState.workOrders.length) return toast('No device drafts to move');
+    if (!confirm(`Move ${opsState.workOrders.length} old device drafts into the shared queue?`)) return;
+    let moved = 0;
+    for (const order of opsState.workOrders) {
+      try {
+        await opsRequest('/rest/v1/ops_work_orders?on_conflict=site_id,dedupe_key', {
+          method: 'POST', headers: { Prefer: 'resolution=ignore-duplicates,return=minimal' },
+          body: JSON.stringify({ id: order.id, site_id: opsConfig.siteId, dedupe_key: order.dedupeKey, title: order.title,
+            priority: order.priority, department: order.department, location: order.location || '', description: order.description || '',
+            notification_subject: order.notificationSubject || '' })
+        });
+        moved++;
+      } catch (error) { toast(`Stopped after ${moved}: ${error.message}`); await refreshOps(); return; }
+    }
+    await refreshOps();
+    toast(`${moved} device drafts checked against the shared queue`);
   }
 
   function showView(name) {
@@ -282,6 +431,7 @@
 
   async function submitFrontdeskPilot(event) {
     event.preventDefault();
+    if (!opsMember) return toast('Sign in with a resort staff account first');
     const output = $('frontdeskPilotOutput');
     const button = event.target.querySelector('button[type="submit"]');
     button.disabled = true;
@@ -289,15 +439,17 @@
     try {
       const response = await fetch('/api/activepieces-frontdesk-issue', {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${opsSession.access_token}` },
         body: JSON.stringify(buildFrontdeskPilotPayload())
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Issue intake failed');
-      output.textContent = formatFrontdeskPilotOutput(data);
-      toast('Front desk issue queued for review');
+      if (data.sharedQueue !== 'saved_or_already_exists') throw new Error('Issue was not saved to the shared queue');
+      await refreshOps();
+      output.textContent = formatFrontdeskPilotOutput(data) + '\n\nSaved to shared resort queue.';
+      $('opsWorkOrderList').scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (error) {
-      output.textContent = `Request failed: ${error.message}`;
+      output.textContent = `Request failed; no shared work order confirmed: ${error.message}`;
     } finally {
       button.disabled = false;
     }
@@ -318,7 +470,7 @@
   }
 
   function exportData() {
-    const blob = new Blob([Core.exportState(state)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ format: 'mclain-os-backup-v1', projects: JSON.parse(Core.exportState(state)), ops: opsState, sharedWorkOrdersSnapshot: sharedOrders }, null, 2)], { type: 'application/json' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `mclain-systems-backup-${new Date().toISOString().slice(0, 10)}.json`;
@@ -346,6 +498,34 @@
     if (archive && confirm('Archive this project from the OS?')) return commit(Core.archiveProject(state, archive.dataset.archiveProject), 'Project archived');
     const sync = event.target.closest('[data-sync-repo]');
     if (sync) return syncRepo(sync.dataset.syncRepo);
+    const claimWorkOrder = event.target.closest('[data-claim-work-order]');
+    if (claimWorkOrder) {
+      updateSharedOrder(claimWorkOrder.dataset.claimWorkOrder, { review_state: 'claimed' }).then(() => toast('Review claimed')).catch(error => toast(error.message));
+      return;
+    }
+    const assignWorkOrder = event.target.closest('[data-assign-work-order]');
+    if (assignWorkOrder) {
+      const id = assignWorkOrder.dataset.assignWorkOrder;
+      const order = sharedOrders.find(item => item.id === id);
+      const name = prompt('Proposed assignee (no dispatch will be sent):', order?.proposedAssignee || '');
+      if (name === null) return;
+      updateSharedOrder(id, { proposed_assignee: name.trim().slice(0, 120) }).then(() => toast('Assignee proposal saved')).catch(error => toast(error.message));
+      return;
+    }
+    const logWorkOrder = event.target.closest('[data-log-work-order]');
+    if (logWorkOrder) {
+      const id = logWorkOrder.dataset.logWorkOrder;
+      const order = sharedOrders.find(item => item.id === id);
+      const evidence = prompt('What was observed or fixed? Include a reference to any photo or document:', order?.resolutionEvidence || '');
+      if (!evidence?.trim()) return;
+      updateSharedOrder(id, { resolution_evidence: evidence.trim().slice(0, 1200) }).then(() => toast('Evidence recorded')).catch(error => toast(error.message));
+      return;
+    }
+    const closeWorkOrder = event.target.closest('[data-close-work-order]');
+    if (closeWorkOrder && confirm('Mark this local draft resolved? This does not close an external work order or contact anyone.')) {
+      updateSharedOrder(closeWorkOrder.dataset.closeWorkOrder, { review_state: 'done' }).then(() => toast('Shared work-order draft resolved')).catch(error => toast(error.message));
+      return;
+    }
   });
 
   document.addEventListener('submit', event => {
@@ -390,6 +570,29 @@
   });
 
   $('frontdeskPilotForm').addEventListener('submit', submitFrontdeskPilot);
+  $('opsAuthForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    const action = event.submitter?.value || 'signin';
+    const email = $('opsEmail').value.trim();
+    const password = $('opsPassword').value;
+    $('opsAuthStatus').textContent = action === 'signup' ? 'Creating account…' : 'Signing in…';
+    try {
+      const path = action === 'signup' ? '/auth/v1/signup' : '/auth/v1/token?grant_type=password';
+      const data = await opsRequest(path, { method: 'POST', body: JSON.stringify({ email, password }) });
+      const session = data.access_token ? data : data.session;
+      $('opsPassword').value = '';
+      if (!session?.access_token) {
+        $('opsAuthStatus').textContent = 'Account created. Check your email to verify it, then sign in. A manager must add your resort membership.';
+        return;
+      }
+      opsSession = session;
+      localStorage.setItem(OPS_SESSION_KEY, JSON.stringify(opsSession));
+      await refreshOps();
+    } catch (error) { $('opsAuthStatus').textContent = error.message; }
+  });
+  $('opsSignOut').addEventListener('click', signOutOps);
+  $('opsImportLocal').addEventListener('click', () => importLocalOps().catch(error => toast(error.message)));
+  $('clearCompletedWorkOrders').addEventListener('click', () => refreshOps().catch(error => toast(error.message)));
   $('projectSearch').addEventListener('input', renderProjects);
   $('projectFilter').addEventListener('change', renderProjects);
   $('quickAdd').addEventListener('click', openProjectDialog);
@@ -401,7 +604,17 @@
   $('importFile').addEventListener('change', async event => {
     const file = event.target.files[0];
     if (!file) return;
-    try { commit(Core.importState(await file.text()), 'Backup imported'); }
+    try {
+      const raw = await file.text();
+      const parsed = JSON.parse(raw);
+      const next = Core.importState(parsed.format === 'mclain-os-backup-v1' ? JSON.stringify(parsed.projects) : raw);
+      if (parsed.format === 'mclain-os-backup-v1') {
+        if (!parsed.ops || !Array.isArray(parsed.ops.workOrders)) throw new Error('Invalid work-order backup');
+        opsState = { workOrders: parsed.ops.workOrders };
+        if (!saveOpsState()) return;
+      }
+      commit(next, 'Backup imported');
+    }
     catch (error) { toast(error.message); }
     event.target.value = '';
   });
@@ -416,6 +629,7 @@
 
   updateNetwork();
   renderAll();
+  if (opsSession) refreshOps().catch(error => { $('opsAuthStatus').textContent = error.message; });
   localStorage.setItem(STORAGE_KEY, Core.exportState(state));
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 })();

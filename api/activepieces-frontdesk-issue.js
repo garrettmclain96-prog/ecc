@@ -3,6 +3,9 @@
 const crypto = require('crypto');
 
 const CONTRACT = 'activepieces.frontdesk_issue.v1';
+const OPS_URL = 'https://vzxtzenlhbqkpbyyvksl.supabase.co';
+const OPS_KEY = 'sb_publishable_Yk9ADeuyKatvKwS-DZEwqA_i-h3NY-_';
+const OPS_SITE = 'd34e5c4c-8c2a-41ca-94b0-da4d1f8019a9';
 const MAX_TEXT = 1200;
 const PRIORITIES = ['low', 'normal', 'high', 'urgent'];
 const CATEGORY_DEPARTMENTS = {
@@ -197,8 +200,28 @@ async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
     const input = await readBody(req);
+    const contract = buildContract(input);
+    const authorization = req.headers?.authorization || '';
+    if (authorization) {
+      if (!/^Bearer [\w.-]+$/.test(authorization)) return res.status(401).json({ error: 'Invalid staff authorization' });
+      const workOrder = contract.workOrder;
+      const stored = await fetch(`${OPS_URL}/rest/v1/ops_work_orders?on_conflict=site_id,dedupe_key`, {
+        method: 'POST',
+        headers: { apikey: OPS_KEY, authorization, 'content-type': 'application/json', Prefer: 'resolution=ignore-duplicates,return=minimal' },
+        body: JSON.stringify({
+          id: workOrder.id, site_id: OPS_SITE, dedupe_key: workOrder.dedupeKey,
+          title: workOrder.title, priority: workOrder.priority, department: workOrder.department,
+          location: workOrder.location || '', description: workOrder.description || '',
+          notification_subject: contract.managerNotification.subject
+        })
+      });
+      if (!stored.ok) return res.status(stored.status === 401 ? 401 : 403).json({ ok: false, contract: CONTRACT, error: 'Shared queue rejected the staff identity or work order' });
+      contract.sharedQueue = 'saved_or_already_exists';
+    } else {
+      contract.sharedQueue = 'preview_only_auth_required';
+    }
     res.setHeader('Cache-Control', 'no-store');
-    return res.status(200).json(buildContract(input));
+    return res.status(200).json(contract);
   } catch (error) {
     const statusCode = error.statusCode || 500;
     return res.status(statusCode).json({ ok: false, contract: CONTRACT, error: error.message || 'Webhook contract failed' });

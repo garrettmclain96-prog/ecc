@@ -49,6 +49,12 @@ The UI shell is cached for offline use. Server-backed ECC checks require connect
 
 The browser cannot submit arbitrary shell text. `POST /api/run` accepts only keys in a server-side allowlist. Commands run with `shell: false`, fixed arguments, an execution timeout, and a 1 MiB output ceiling.
 
+## Work-order pilot status
+
+The System view can submit a front-desk test issue after staff sign-in and save the returned draft to the shared `public.ops_work_orders` table in the Jamaica Beach Supabase project. The Ops review list supports manager review, proposed assignment, evidence and resolution. Duplicate intake is ignored using `(site_id, dedupe_key)`. The first manager account requires an existing resort site membership (`profiles.user_id` joined to `site_memberships.profile_id` with `access_level = 'manager'` or `owner`). New self-registered accounts receive no site membership automatically. The table migration is in `mclain-app/supabase/work_orders.sql`. Anonymous access has no grant, staff members can read and insert new drafts, and managers can update them.
+
+Old device drafts remain local until an approved member taps **Move old device drafts**. Backups contain local drafts and a read-only snapshot of the last loaded shared queue; importing a backup does not overwrite shared records. `/api/activepieces-frontdesk-issue` returns a preview with no authorization; with a valid site-member Bearer token, it saves to the shared queue. Activepieces still needs a dedicated member account and token refresh step before its live webhook can save events. Proposed assignees are not dispatched; marking a draft resolved does not close an external ticket. There is no live Vonage, OCR, voice, document search, scheduling, or Hugging Face integration.
+
 ## Current allowlist
 
 - doctor

@@ -30,6 +30,10 @@
       "destination": "/mclain-app/public/core.js"
     },
     {
+      "source": "/ops-config.js",
+      "destination": "/mclain-app/public/ops-config.js"
+    },
+    {
       "source": "/app.js",
       "destination": "/mclain-app/public/app.js"
     },

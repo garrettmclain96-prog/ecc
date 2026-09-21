@@ -103,7 +103,7 @@
         </section>
         <section class="surface">
           <div class="section-row"><div><p class="overline">ACTIVEPIECES PILOT</p><h2>Front desk issue intake</h2></div></div>
-          <p class="surface-copy">Send a test issue into the webhook contract. The response creates a queued work-order draft and manager notification that still requires approval before any external message or dispatch.</p>
+          <p class="surface-copy">Sign in below to save test issues to the resort's shared queue. No message or dispatch is sent.</p>
           <form id="frontdeskPilotForm" class="pilot-form form-surface">
             <label>Issue title<input id="frontdeskTitle" required maxlength="160" value="Guest reported leaking pedestal"></label>
             <label>Details<textarea id="frontdeskDescription" required maxlength="1200" rows="4">Water is pooling near the RV pedestal and the guest is asking for maintenance.</textarea></label>
@@ -120,6 +120,17 @@
           <pre id="frontdeskPilotOutput" class="diagnostic-output">No issue submitted.</pre>
         </section>
         <section class="surface">
+          <div class="section-row"><div><p class="overline">OPS REVIEW</p><h2>Work-order drafts</h2></div><button id="clearCompletedWorkOrders" class="text-button" type="button">Refresh queue</button></div>
+          <p class="surface-copy">The shared queue is visible to approved resort staff. Managers can claim, propose an assignee and record evidence here; no staff dispatch or guest message is sent.</p>
+          <form id="opsAuthForm" class="form-surface">
+            <div class="split-fields"><label>Staff email<input id="opsEmail" type="email" autocomplete="email" required></label><label>Password<input id="opsPassword" type="password" autocomplete="current-password" minlength="8" required></label></div>
+            <div class="button-row"><button class="secondary-button" type="submit" name="authAction" value="signin">Sign in</button><button class="secondary-button" type="submit" name="authAction" value="signup">Create account</button></div>
+          </form>
+          <div id="opsAuthStatus" class="surface-copy" role="status"></div>
+          <div id="opsMemberActions" class="button-row" hidden><button id="opsSignOut" class="secondary-button" type="button">Sign out</button><button id="opsImportLocal" class="secondary-button" type="button">Move old device drafts</button></div>
+          <div id="opsWorkOrderList" class="work-order-list"></div>
+        </section>
+        <section class="surface">
           <div class="section-row"><div><p class="overline">SAFE DIAGNOSTICS</p><h2>ECC engine</h2></div></div>
           <p class="surface-copy">These checks verify the machinery behind this OS. They are support tools—not the main product.</p>
           <div id="diagnosticButtons" class="diagnostic-grid"></div>
@@ -127,7 +138,7 @@
         </section>
         <section class="surface">
           <p class="overline">DATA OWNERSHIP</p><h2>Your records stay portable</h2>
-          <p class="surface-copy">This version saves on this iPhone. Export a backup before clearing Safari data or changing devices.</p>
+          <p class="surface-copy">Projects stay on this device. Work orders sync after staff sign-in; backups include the last loaded queue and any old device drafts.</p>
           <div class="button-row"><button id="exportData" class="secondary-button">Export backup</button><button id="importData" class="secondary-button">Import backup</button></div>
           <input id="importFile" type="file" accept="application/json,.json" hidden>
         </section>
@@ -163,6 +174,7 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="/core.js"></script>
+  <script src="/ops-config.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>
