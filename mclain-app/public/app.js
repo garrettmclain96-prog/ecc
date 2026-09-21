@@ -437,6 +437,7 @@
     button.disabled = true;
     output.textContent = 'Sending test issue…';
     try {
+      await opsRequest('/auth/v1/user');
       const response = await fetch('/api/activepieces-frontdesk-issue', {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${opsSession.access_token}` },
