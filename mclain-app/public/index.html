@@ -102,6 +102,24 @@
           <div id="capabilityGrid" class="capability-grid"><span class="surface-copy">Loading capability registry…</span></div>
         </section>
         <section class="surface">
+          <div class="section-row"><div><p class="overline">ACTIVEPIECES PILOT</p><h2>Front desk issue intake</h2></div></div>
+          <p class="surface-copy">Send a test issue into the webhook contract. The response creates a queued work-order draft and manager notification that still requires approval before any external message or dispatch.</p>
+          <form id="frontdeskPilotForm" class="pilot-form form-surface">
+            <label>Issue title<input id="frontdeskTitle" required maxlength="160" value="Guest reported leaking pedestal"></label>
+            <label>Details<textarea id="frontdeskDescription" required maxlength="1200" rows="4">Water is pooling near the RV pedestal and the guest is asking for maintenance.</textarea></label>
+            <div class="split-fields">
+              <label>Location<input id="frontdeskLocation" maxlength="160" value="Site 42"></label>
+              <label>Reported by<input id="frontdeskReportedBy" maxlength="120" value="Front Desk"></label>
+            </div>
+            <div class="split-fields">
+              <label>Category<select id="frontdeskCategory"><option value="maintenance" selected>Maintenance</option><option value="grounds">Grounds</option><option value="security">Security</option><option value="bar">Bar</option><option value="office">Office</option><option value="pool">Pool</option></select></label>
+              <label>Priority<select id="frontdeskPriority"><option value="normal">Normal</option><option value="high" selected>High</option><option value="urgent">Urgent</option><option value="low">Low</option></select></label>
+            </div>
+            <button class="primary-button" type="submit">Send test issue <span>→</span></button>
+          </form>
+          <pre id="frontdeskPilotOutput" class="diagnostic-output">No issue submitted.</pre>
+        </section>
+        <section class="surface">
           <div class="section-row"><div><p class="overline">SAFE DIAGNOSTICS</p><h2>ECC engine</h2></div></div>
           <p class="surface-copy">These checks verify the machinery behind this OS. They are support tools—not the main product.</p>
           <div id="diagnosticButtons" class="diagnostic-grid"></div>

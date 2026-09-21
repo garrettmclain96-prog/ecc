@@ -246,6 +246,63 @@
     }
   }
 
+  function buildFrontdeskPilotPayload() {
+    const issueId = window.crypto?.randomUUID ? window.crypto.randomUUID() : Date.now().toString(36);
+    return {
+      issueId: `pilot-${issueId}`,
+      title: $('frontdeskTitle').value.trim(),
+      description: $('frontdeskDescription').value.trim(),
+      location: $('frontdeskLocation').value.trim(),
+      category: $('frontdeskCategory').value,
+      priority: $('frontdeskPriority').value,
+      reportedBy: $('frontdeskReportedBy').value.trim() || 'Front Desk'
+    };
+  }
+
+  function formatFrontdeskPilotOutput(data) {
+    if (!data?.ok) return data?.error || 'Issue intake failed.';
+    const lines = [
+      `contract: ${data.contract}`,
+      `workOrder: ${data.workOrder.id}`,
+      `status: ${data.workOrder.status}`,
+      `department: ${data.workOrder.department}`,
+      `priority: ${data.workOrder.priority}`,
+      `dedupe: ${data.workOrder.dedupeKey}`,
+      `notification: ${data.managerNotification.status}`,
+      `approvalRequired: ${data.managerNotification.approvalRequired}`,
+      '',
+      'next:',
+      ...data.workOrder.nextActions.map((action, index) => `${index + 1}. ${action}`),
+      '',
+      'approval boundary:',
+      ...data.automationBoundaries.requiresApproval.map(action => `- ${action}`)
+    ];
+    return lines.join('\n');
+  }
+
+  async function submitFrontdeskPilot(event) {
+    event.preventDefault();
+    const output = $('frontdeskPilotOutput');
+    const button = event.target.querySelector('button[type="submit"]');
+    button.disabled = true;
+    output.textContent = 'Sending test issue…';
+    try {
+      const response = await fetch('/api/activepieces-frontdesk-issue', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(buildFrontdeskPilotPayload())
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Issue intake failed');
+      output.textContent = formatFrontdeskPilotOutput(data);
+      toast('Front desk issue queued for review');
+    } catch (error) {
+      output.textContent = `Request failed: ${error.message}`;
+    } finally {
+      button.disabled = false;
+    }
+  }
+
   async function runDiagnostic(command, button) {
     if (!navigator.onLine) return toast('Diagnostics require a connection');
     const output = $('diagnosticOutput');
@@ -332,6 +389,7 @@
     openProject(projectId);
   });
 
+  $('frontdeskPilotForm').addEventListener('submit', submitFrontdeskPilot);
   $('projectSearch').addEventListener('input', renderProjects);
   $('projectFilter').addEventListener('change', renderProjects);
   $('quickAdd').addEventListener('click', openProjectDialog);
