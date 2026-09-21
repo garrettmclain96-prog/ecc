@@ -100,7 +100,7 @@
   function showView(name) {
     document.querySelectorAll('.view').forEach(view => view.classList.toggle('active', view.id === `${name}View`));
     document.querySelectorAll('.nav-button').forEach(button => button.classList.toggle('active', button.dataset.view === name));
-    if (name === 'system') loadSystemStatus();
+    if (name === 'system') { loadSystemStatus(); loadCapabilities(); }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -215,6 +215,27 @@
     } catch {
       $('systemState').textContent = 'offline';
       $('systemMetrics').innerHTML = '<span>Runtime status is unavailable.</span>';
+    }
+  }
+
+  async function loadCapabilities() {
+    const target = $('capabilityGrid');
+    if (!target || !navigator.onLine) return;
+    try {
+      const response = await fetch('/api/capabilities');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Capability registry unavailable');
+      target.innerHTML = data.capabilities.map(item => {
+        const repoUrl = item.repo ? 'https://github.com/' + item.repo : '';
+        const primaryUrl = item.url || repoUrl;
+        return `<a class="capability-card" href="${escapeHtml(primaryUrl)}" target="_blank" rel="noopener">
+          <div class="between"><strong>${escapeHtml(item.name)}</strong><span class="state-pill ${item.status === 'active' ? 'ready' : ''}">${escapeHtml(item.status)}</span></div>
+          <small>${escapeHtml(item.role)}</small>
+          <p>${escapeHtml(item.purpose)}</p>
+        </a>`;
+      }).join('');
+    } catch (error) {
+      target.innerHTML = `<p class="surface-copy">${escapeHtml(error.message)}</p>`;
     }
   }
 
