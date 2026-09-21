@@ -5,6 +5,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const capabilitiesHandler = require('../api/capabilities.js');
+const repoStatusHandler = require('../api/repo-status.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC = path.join(__dirname, 'public');
@@ -30,6 +32,28 @@ function sendJson(res, code, body) {
     'x-content-type-options': 'nosniff'
   });
   res.end(payload);
+}
+
+function runApiHandler(handler, req, res, query) {
+  const apiReq = Object.assign(req, { query });
+  const apiRes = {
+    setHeader(name, value) {
+      res.setHeader(name, value);
+    },
+    status(code) {
+      res.statusCode = code;
+      return this;
+    },
+    json(body) {
+      const payload = JSON.stringify(body, null, 2);
+      if (!res.hasHeader('content-type')) res.setHeader('content-type', 'application/json; charset=utf-8');
+      if (!res.hasHeader('x-content-type-options')) res.setHeader('x-content-type-options', 'nosniff');
+      res.setHeader('content-length', Buffer.byteLength(payload));
+      res.end(payload);
+    }
+  };
+
+  return handler(apiReq, apiRes);
 }
 
 function readJson(rel) {
@@ -253,6 +277,14 @@ const server = http.createServer(async (req, res) => {
         profile: profiles.profiles.mclain || null,
         module: modules.modules.find(item => item.id === 'mclain-systems') || null
       });
+    }
+
+    if (req.method === 'GET' && url.pathname === '/api/capabilities') {
+      return runApiHandler(capabilitiesHandler, req, res, Object.fromEntries(url.searchParams));
+    }
+
+    if (req.method === 'GET' && url.pathname === '/api/repo-status') {
+      return runApiHandler(repoStatusHandler, req, res, Object.fromEntries(url.searchParams));
     }
 
     if (req.method === 'POST' && url.pathname === '/api/run') {
