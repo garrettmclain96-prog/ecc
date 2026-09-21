@@ -1,0 +1,119 @@
+{
+  "$schema": "https://mclain.systems/schemas/activepieces-flow-blueprint.v1.json",
+  "name": "OpsPost Front Desk Issue Intake",
+  "engine": "activepieces",
+  "status": "pilot-ready",
+  "contract": "activepieces.frontdesk_issue.v1",
+  "ownerInterface": "McLain Systems OS workflow trigger API",
+  "trigger": {
+    "piece": "webhook",
+    "action": "catch_webhook",
+    "event": "frontdesk.issue.created",
+    "source": "OpsPost or Beachside Crew front desk form"
+  },
+  "target": {
+    "method": "POST",
+    "baseUrlEnv": "MCLAIN_OS_BASE_URL",
+    "path": "/api/activepieces-frontdesk-issue",
+    "headers": {
+      "content-type": "application/json"
+    }
+  },
+  "inputMapping": {
+    "issueId": "{{trigger.body.issueId || trigger.body.id || trigger.body.ticketId}}",
+    "title": "{{trigger.body.title || trigger.body.summary || trigger.body.issue}}",
+    "description": "{{trigger.body.description || trigger.body.details || trigger.body.message}}",
+    "location": "{{trigger.body.location || trigger.body.siteLocation || trigger.body.unit || trigger.body.area}}",
+    "category": "{{trigger.body.category || trigger.body.department || trigger.body.type || 'guest'}}",
+    "priority": "{{trigger.body.priority || trigger.body.severity || 'normal'}}",
+    "reportedBy": "{{trigger.body.reportedBy || trigger.body.requester || trigger.body.guestName || 'Front Desk'}}",
+    "site": "{{trigger.body.site || trigger.body.property || 'Jamaica Beach RV Resort'}}",
+    "guestImpact": "{{trigger.body.guestImpact || trigger.body.impact || ''}}",
+    "requestedAction": "{{trigger.body.requestedAction || trigger.body.action || ''}}"
+  },
+  "requiredInputFields": [
+    "title"
+  ],
+  "acceptedMinimum": {
+    "descriptionOrLocation": true
+  },
+  "successChecks": [
+    {
+      "path": "ok",
+      "equals": true
+    },
+    {
+      "path": "contract",
+      "equals": "activepieces.frontdesk_issue.v1"
+    },
+    {
+      "path": "workOrder.status",
+      "equals": "queued_for_ops_review"
+    },
+    {
+      "path": "managerNotification.status",
+      "equals": "draft_requires_approval"
+    },
+    {
+      "path": "managerNotification.approvalRequired",
+      "equals": true
+    }
+  ],
+  "activepiecesSteps": [
+    {
+      "id": "catch_frontdesk_issue",
+      "type": "trigger",
+      "piece": "Webhook",
+      "action": "Catch Webhook",
+      "output": "Raw front-desk issue event"
+    },
+    {
+      "id": "normalize_issue_payload",
+      "type": "transform",
+      "piece": "Code or field mapping",
+      "output": "JSON body matching inputMapping"
+    },
+    {
+      "id": "post_to_mclain_os",
+      "type": "action",
+      "piece": "HTTP",
+      "action": "Send Request",
+      "method": "POST",
+      "url": "{{MCLAIN_OS_BASE_URL}}/api/activepieces-frontdesk-issue",
+      "body": "{{normalize_issue_payload.output}}"
+    },
+    {
+      "id": "verify_contract_response",
+      "type": "condition",
+      "checks": "successChecks"
+    },
+    {
+      "id": "manager_review",
+      "type": "approval",
+      "input": "{{post_to_mclain_os.response.managerNotification}}",
+      "reason": "External messages, staff dispatch, and guest contact require human approval."
+    }
+  ],
+  "approvalBoundary": {
+    "allowedWithoutApproval": [
+      "catch front-desk webhook events",
+      "normalize issue payload",
+      "POST the event into McLain Systems OS",
+      "create queued work-order draft",
+      "create manager notification draft"
+    ],
+    "requiresApproval": [
+      "send SMS, email, push, or Vonage message",
+      "dispatch staff",
+      "close or cancel a work order",
+      "change employee schedule or payroll records",
+      "contact a guest"
+    ]
+  },
+  "proof": {
+    "sampleEvent": "integrations/activepieces/frontdesk-issue.sample.json",
+    "expectedWorkOrderStatus": "queued_for_ops_review",
+    "expectedNotificationStatus": "draft_requires_approval",
+    "dedupeField": "workOrder.dedupeKey"
+  }
+}

@@ -52,8 +52,10 @@ const CAPABILITIES = [
       adapter: 'server-side event bridge',
       firstPilot: 'OpsPost front-desk issue creates a work order and manager notification',
       endpoint: '/api/activepieces-frontdesk-issue',
-      readiness: 'pilot contract available',
-      nextAction: 'Wire Activepieces to POST front-desk issue events into the pilot endpoint.',
+      flowBlueprint: 'integrations/activepieces/frontdesk-issue-flow.blueprint.json',
+      sampleEvent: 'integrations/activepieces/frontdesk-issue.sample.json',
+      readiness: 'pilot flow blueprint available',
+      nextAction: 'Create the Activepieces flow from the checked-in blueprint and point it at the deployed McLain OS base URL.',
       proof: 'A test issue event creates exactly one work-order action with no duplicate notification.'
     }
   },

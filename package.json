@@ -97,6 +97,7 @@
     "hooks/",
     "install.ps1",
     "install.sh",
+    "integrations/activepieces/",
     "manifests/",
     "mcp-configs/",
     "plugins/ecc/",

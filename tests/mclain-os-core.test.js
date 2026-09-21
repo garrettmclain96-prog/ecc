@@ -1,6 +1,8 @@
 'use strict';
 
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 const {
   createInitialState,
   createProject,
@@ -15,6 +17,8 @@ const {
 const repoStatusHandler = require('../api/repo-status.js');
 const capabilitiesHandler = require('../api/capabilities.js');
 const activepiecesFrontdeskIssue = require('../api/activepieces-frontdesk-issue.js');
+
+const rootDir = path.resolve(__dirname, '..');
 
 function invokeJsonHandler(handler, method = 'GET') {
   let statusCode = 200;
@@ -89,16 +93,17 @@ function run() {
 
   const activepieces = capabilitiesResponse.payload.capabilities.find(item => item.id === 'activepieces');
   assert.equal(activepieces.integration.endpoint, '/api/activepieces-frontdesk-issue');
+  assert.equal(activepieces.integration.flowBlueprint, 'integrations/activepieces/frontdesk-issue-flow.blueprint.json');
+  assert.equal(activepieces.integration.sampleEvent, 'integrations/activepieces/frontdesk-issue.sample.json');
 
-  const frontdeskInput = {
-    issueId: 'fd-42',
-    title: 'Guest reported leaking pedestal',
-    description: 'Water is pooling near the RV pedestal.',
-    location: 'Site 42',
-    category: 'maintenance',
-    priority: 'high',
-    reportedBy: 'Front Desk'
-  };
+  const activepiecesBlueprint = JSON.parse(fs.readFileSync(path.join(rootDir, activepieces.integration.flowBlueprint), 'utf8'));
+  assert.equal(activepiecesBlueprint.contract, activepiecesFrontdeskIssue.CONTRACT);
+  assert.equal(activepiecesBlueprint.target.path, activepieces.integration.endpoint);
+  assert.equal(activepiecesBlueprint.target.method, 'POST');
+  assert.ok(activepiecesBlueprint.successChecks.some(check => check.path === 'managerNotification.approvalRequired' && check.equals === true));
+  assert.ok(activepiecesBlueprint.approvalBoundary.requiresApproval.includes('dispatch staff'));
+
+  const frontdeskInput = JSON.parse(fs.readFileSync(path.join(rootDir, activepieces.integration.sampleEvent), 'utf8'));
   const firstContract = activepiecesFrontdeskIssue.buildContract(frontdeskInput);
   const secondContract = activepiecesFrontdeskIssue.buildContract(frontdeskInput);
   assert.equal(firstContract.contract, activepiecesFrontdeskIssue.CONTRACT);

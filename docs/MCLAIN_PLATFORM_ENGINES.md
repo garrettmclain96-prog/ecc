@@ -72,7 +72,7 @@ Every engine must enter McLain Systems through a small owned interface, not dire
 | --- | --- | --- | --- | --- |
 | Aurora Core | Aurora case API | RV refrigerator or resort equipment diagnostic case | Define the case payload McLain OS sends to Aurora and the outcome payload Aurora returns. | A project can generate an Aurora handoff and save the verified fix as equipment evidence. |
 | ECC | Safe command runner | McLain OS diagnostics and project handoff generation | Keep expanding only allowlisted diagnostics that create operator proof. | A diagnostic can be launched from System view and returns bounded output. |
-| Activepieces | Workflow trigger API at `/api/activepieces-frontdesk-issue` | OpsPost front-desk issue creates a work order and manager notification | Wire Activepieces to POST front-desk issue events into the pilot endpoint. | A test issue event creates exactly one work-order action with no duplicate notification. |
+| Activepieces | Workflow trigger API at `/api/activepieces-frontdesk-issue` | OpsPost front-desk issue creates a work order and manager notification | Create the Activepieces flow from `integrations/activepieces/frontdesk-issue-flow.blueprint.json` and point it at the deployed McLain OS base URL. | A test issue event creates exactly one work-order action with no duplicate notification. |
 | Mem0 | Memory gateway | Equipment and project memory for Aurora plus McLain OS | Define memory scopes, tenant boundaries, and a write policy before storing live records. | A saved equipment fact can be recalled by project and equipment scope without leaking across scopes. |
 | Electric | Sync-backed state store | McLain OS project list and action queue | Choose the smallest durable dataset: projects, actions, blockers, evidence, links. | A project created on one device appears on another device and survives offline edits. |
 
@@ -83,6 +83,9 @@ A fork is justified when McLain-specific patches, deployment control, or long-te
 ## Activepieces pilot contract
 
 `POST /api/activepieces-frontdesk-issue`
+
+Flow blueprint: `integrations/activepieces/frontdesk-issue-flow.blueprint.json`
+Sample event: `integrations/activepieces/frontdesk-issue.sample.json`
 
 Minimum input:
 
