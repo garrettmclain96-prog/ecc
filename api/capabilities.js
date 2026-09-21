@@ -22,6 +22,39 @@ const CAPABILITIES = [
     routes: ['build', 'verify', 'review', 'skills']
   },
   {
+    id: 'activepieces',
+    name: 'Activepieces',
+    role: 'Automation and integration engine',
+    status: 'planned',
+    repo: 'activepieces/activepieces',
+    url: 'https://github.com/activepieces/activepieces',
+    purpose: 'Provides reusable workflow automation, app integrations, human approval steps, webhooks, schedules, and action routing.',
+    routes: ['automate', 'integrate', 'approve', 'schedule', 'webhook'],
+    useFor: ['OpsPost front-desk workflows', 'Quo and email automations', 'project automations', 'cross-app orchestration']
+  },
+  {
+    id: 'mem0',
+    name: 'Mem0',
+    role: 'Shared memory spine',
+    status: 'planned',
+    repo: 'mem0ai/mem0',
+    url: 'https://github.com/mem0ai/mem0',
+    purpose: 'Supplies persistent, searchable agent memory that can be scoped across users, projects, assets, cases, equipment, and decisions.',
+    routes: ['remember', 'recall', 'search-memory', 'project-context'],
+    useFor: ['Aurora equipment history', 'ECC project memory', 'OpsPost organizational context', 'Brainchild continuity']
+  },
+  {
+    id: 'electric',
+    name: 'Electric',
+    role: 'Local-first sync engine',
+    status: 'planned',
+    repo: 'electric-sql/electric',
+    url: 'https://github.com/electric-sql/electric',
+    purpose: 'Creates a durable path between Postgres-backed system state and responsive local-first clients.',
+    routes: ['sync', 'offline', 'realtime', 'replicate'],
+    useFor: ['McLain Systems OS cross-device state', 'iPhone offline-first data', 'OpsPost realtime state', 'field applications']
+  },
+  {
     id: 'agent-skills',
     name: 'Agent Skills',
     role: 'Reusable capability library',
@@ -95,7 +128,10 @@ module.exports = function handler(req, res) {
     architecture: {
       controlPlane: 'McLain Systems OS',
       physicalIntelligence: 'Aurora Core',
-      engineeringRuntime: 'ECC'
+      engineeringRuntime: 'ECC',
+      automationEngine: 'Activepieces',
+      memorySpine: 'Mem0',
+      syncEngine: 'Electric'
     },
     capabilities: CAPABILITIES
   });
