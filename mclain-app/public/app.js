@@ -228,10 +228,17 @@
       target.innerHTML = data.capabilities.map(item => {
         const repoUrl = item.repo ? 'https://github.com/' + item.repo : '';
         const primaryUrl = item.url || repoUrl;
+        const integration = item.integration ? `
+          <div class="capability-contract">
+            <span>${escapeHtml(item.integration.readiness)}</span>
+            <b>${escapeHtml(item.integration.firstPilot)}</b>
+            <small>${escapeHtml(item.integration.nextAction)}</small>
+          </div>` : '';
         return `<a class="capability-card" href="${escapeHtml(primaryUrl)}" target="_blank" rel="noopener">
           <div class="between"><strong>${escapeHtml(item.name)}</strong><span class="state-pill ${item.status === 'active' ? 'ready' : ''}">${escapeHtml(item.status)}</span></div>
           <small>${escapeHtml(item.role)}</small>
           <p>${escapeHtml(item.purpose)}</p>
+          ${integration}
         </a>`;
       }).join('');
     } catch (error) {

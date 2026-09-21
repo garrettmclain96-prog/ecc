@@ -64,6 +64,18 @@ Upstream: `electric-sql/electric`
 5. Pilot Activepieces with one OpsPost workflow.
 6. Add observability and tests before expanding each engine.
 
+## Integration contracts
+
+Every engine must enter McLain Systems through a small owned interface, not direct UI sprawl.
+
+| Engine | Owned interface | First pilot | Next action | Acceptance proof |
+| --- | --- | --- | --- | --- |
+| Aurora Core | Aurora case API | RV refrigerator or resort equipment diagnostic case | Define the case payload McLain OS sends to Aurora and the outcome payload Aurora returns. | A project can generate an Aurora handoff and save the verified fix as equipment evidence. |
+| ECC | Safe command runner | McLain OS diagnostics and project handoff generation | Keep expanding only allowlisted diagnostics that create operator proof. | A diagnostic can be launched from System view and returns bounded output. |
+| Activepieces | Workflow trigger API | OpsPost front-desk issue creates a work order and manager notification | Create one webhook contract with human approval before external messages or account changes. | A test issue event creates exactly one work-order action with no duplicate notification. |
+| Mem0 | Memory gateway | Equipment and project memory for Aurora plus McLain OS | Define memory scopes, tenant boundaries, and a write policy before storing live records. | A saved equipment fact can be recalled by project and equipment scope without leaking across scopes. |
+| Electric | Sync-backed state store | McLain OS project list and action queue | Choose the smallest durable dataset: projects, actions, blockers, evidence, links. | A project created on one device appears on another device and survives offline edits. |
+
 ## Fork policy
 
 A fork is justified when McLain-specific patches, deployment control, or long-term divergence are required. Otherwise prefer a pinned upstream dependency or an adapter. This keeps upstream updates usable and reduces maintenance debt.

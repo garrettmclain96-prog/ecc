@@ -13,6 +13,22 @@ const {
   buildHandoff
 } = require('../mclain-app/public/core.js');
 const repoStatusHandler = require('../api/repo-status.js');
+const capabilitiesHandler = require('../api/capabilities.js');
+
+function invokeJsonHandler(handler, method = 'GET') {
+  let statusCode = 200;
+  const headers = {};
+  let payload;
+  handler(
+    { method, query: {} },
+    {
+      setHeader(name, value) { headers[name.toLowerCase()] = value; },
+      status(code) { statusCode = code; return this; },
+      json(body) { payload = body; return this; }
+    }
+  );
+  return { statusCode, headers, payload };
+}
 
 function run() {
   const initial = createInitialState();
@@ -57,6 +73,18 @@ function run() {
 
   assert.deepEqual(repoStatusHandler.parseRepoRef('garrettmclain96-prog', 'ecc'), { owner: 'garrettmclain96-prog', repo: 'ecc' });
   assert.equal(repoStatusHandler.parseRepoRef('../secret', 'ecc'), null);
+
+  const capabilitiesResponse = invokeJsonHandler(capabilitiesHandler);
+  assert.equal(capabilitiesResponse.statusCode, 200);
+  assert.equal(capabilitiesResponse.payload.system, 'McLain Systems OS');
+  for (const engineId of ['aurora', 'ecc', 'activepieces', 'mem0', 'electric']) {
+    const engine = capabilitiesResponse.payload.capabilities.find(item => item.id === engineId);
+    assert.ok(engine, `${engineId} is registered`);
+    assert.ok(engine.integration?.ownerInterface, `${engineId} has an owned interface`);
+    assert.ok(engine.integration?.firstPilot, `${engineId} has a first pilot`);
+    assert.ok(engine.integration?.nextAction, `${engineId} has a next action`);
+    assert.ok(engine.integration?.proof, `${engineId} has acceptance proof`);
+  }
 }
 
 run();

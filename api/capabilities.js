@@ -10,7 +10,15 @@ const CAPABILITIES = [
     url: 'https://aurora-core-beta.vercel.app',
     purpose: 'Turns a real-world problem into a safe diagnostic case, guided tests, probable cause, verified fix, and remembered equipment.',
     routes: ['repair', 'equipment-memory', 'vision', 'hands-free'],
-    useFor: ['RV and appliance diagnostics', 'resort maintenance', 'equipment history', 'TurnBot/device diagnostics']
+    useFor: ['RV and appliance diagnostics', 'resort maintenance', 'equipment history', 'TurnBot/device diagnostics'],
+    integration: {
+      ownerInterface: 'Aurora case API',
+      adapter: 'server-side diagnostic handoff',
+      firstPilot: 'RV refrigerator or resort equipment diagnostic case',
+      readiness: 'live reference app exists',
+      nextAction: 'Define the case payload McLain OS sends to Aurora and the outcome payload Aurora returns.',
+      proof: 'A project can generate an Aurora handoff and save the verified fix as equipment evidence.'
+    }
   },
   {
     id: 'ecc',
@@ -19,7 +27,15 @@ const CAPABILITIES = [
     status: 'active',
     repo: 'garrettmclain96-prog/ecc',
     purpose: 'Plans, verifies, reviews, remembers, and improves agent-assisted engineering work.',
-    routes: ['build', 'verify', 'review', 'skills']
+    routes: ['build', 'verify', 'review', 'skills'],
+    integration: {
+      ownerInterface: 'safe command runner',
+      adapter: 'allowlisted local/server command execution',
+      firstPilot: 'McLain OS diagnostics and project handoff generation',
+      readiness: 'active in current app',
+      nextAction: 'Keep expanding only allowlisted diagnostics that create operator proof.',
+      proof: 'A diagnostic can be launched from System view and returns bounded output.'
+    }
   },
   {
     id: 'activepieces',
@@ -30,7 +46,15 @@ const CAPABILITIES = [
     url: 'https://github.com/activepieces/activepieces',
     purpose: 'Provides reusable workflow automation, app integrations, human approval steps, webhooks, schedules, and action routing.',
     routes: ['automate', 'integrate', 'approve', 'schedule', 'webhook'],
-    useFor: ['OpsPost front-desk workflows', 'Quo and email automations', 'project automations', 'cross-app orchestration']
+    useFor: ['OpsPost front-desk workflows', 'Quo and email automations', 'project automations', 'cross-app orchestration'],
+    integration: {
+      ownerInterface: 'workflow trigger API',
+      adapter: 'server-side event bridge',
+      firstPilot: 'OpsPost front-desk issue creates a work order and manager notification',
+      readiness: 'adapter not built',
+      nextAction: 'Create one webhook contract with human approval before external messages or account changes.',
+      proof: 'A test issue event creates exactly one work-order action with no duplicate notification.'
+    }
   },
   {
     id: 'mem0',
@@ -41,7 +65,15 @@ const CAPABILITIES = [
     url: 'https://github.com/mem0ai/mem0',
     purpose: 'Supplies persistent, searchable agent memory that can be scoped across users, projects, assets, cases, equipment, and decisions.',
     routes: ['remember', 'recall', 'search-memory', 'project-context'],
-    useFor: ['Aurora equipment history', 'ECC project memory', 'OpsPost organizational context', 'Brainchild continuity']
+    useFor: ['Aurora equipment history', 'ECC project memory', 'OpsPost organizational context', 'Brainchild continuity'],
+    integration: {
+      ownerInterface: 'memory gateway',
+      adapter: 'scoped storage/retrieval service',
+      firstPilot: 'equipment and project memory for Aurora plus McLain OS',
+      readiness: 'adapter not built',
+      nextAction: 'Define memory scopes, tenant boundaries, and a write policy before storing live records.',
+      proof: 'A saved equipment fact can be recalled by project and equipment scope without leaking across scopes.'
+    }
   },
   {
     id: 'electric',
@@ -52,7 +84,15 @@ const CAPABILITIES = [
     url: 'https://github.com/electric-sql/electric',
     purpose: 'Creates a durable path between Postgres-backed system state and responsive local-first clients.',
     routes: ['sync', 'offline', 'realtime', 'replicate'],
-    useFor: ['McLain Systems OS cross-device state', 'iPhone offline-first data', 'OpsPost realtime state', 'field applications']
+    useFor: ['McLain Systems OS cross-device state', 'iPhone offline-first data', 'OpsPost realtime state', 'field applications'],
+    integration: {
+      ownerInterface: 'sync-backed state store',
+      adapter: 'Postgres to local-first replication',
+      firstPilot: 'McLain OS project list and action queue',
+      readiness: 'adapter not built',
+      nextAction: 'Choose the smallest durable dataset: projects, actions, blockers, evidence, links.',
+      proof: 'A project created on one device appears on another device and survives offline edits.'
+    }
   },
   {
     id: 'agent-skills',
@@ -136,3 +176,5 @@ module.exports = function handler(req, res) {
     capabilities: CAPABILITIES
   });
 };
+
+module.exports.CAPABILITIES = CAPABILITIES;
