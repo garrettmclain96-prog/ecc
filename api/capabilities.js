@@ -51,8 +51,9 @@ const CAPABILITIES = [
       ownerInterface: 'workflow trigger API',
       adapter: 'server-side event bridge',
       firstPilot: 'OpsPost front-desk issue creates a work order and manager notification',
-      readiness: 'adapter not built',
-      nextAction: 'Create one webhook contract with human approval before external messages or account changes.',
+      endpoint: '/api/activepieces-frontdesk-issue',
+      readiness: 'pilot contract available',
+      nextAction: 'Wire Activepieces to POST front-desk issue events into the pilot endpoint.',
       proof: 'A test issue event creates exactly one work-order action with no duplicate notification.'
     }
   },

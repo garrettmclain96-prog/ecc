@@ -5,6 +5,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const activepiecesFrontdeskIssueHandler = require('../api/activepieces-frontdesk-issue.js');
 const capabilitiesHandler = require('../api/capabilities.js');
 const repoStatusHandler = require('../api/repo-status.js');
 
@@ -34,8 +35,8 @@ function sendJson(res, code, body) {
   res.end(payload);
 }
 
-function runApiHandler(handler, req, res, query) {
-  const apiReq = Object.assign(req, { query });
+function runApiHandler(handler, req, res, query, body) {
+  const apiReq = Object.assign(req, { query, body });
   const apiRes = {
     setHeader(name, value) {
       res.setHeader(name, value);
@@ -285,6 +286,11 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'GET' && url.pathname === '/api/repo-status') {
       return runApiHandler(repoStatusHandler, req, res, Object.fromEntries(url.searchParams));
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/activepieces-frontdesk-issue') {
+      const input = await parseBody(req);
+      return runApiHandler(activepiecesFrontdeskIssueHandler, req, res, Object.fromEntries(url.searchParams), input);
     }
 
     if (req.method === 'POST' && url.pathname === '/api/run') {

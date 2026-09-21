@@ -14,6 +14,7 @@ const {
 } = require('../mclain-app/public/core.js');
 const repoStatusHandler = require('../api/repo-status.js');
 const capabilitiesHandler = require('../api/capabilities.js');
+const activepiecesFrontdeskIssue = require('../api/activepieces-frontdesk-issue.js');
 
 function invokeJsonHandler(handler, method = 'GET') {
   let statusCode = 200;
@@ -85,6 +86,28 @@ function run() {
     assert.ok(engine.integration?.nextAction, `${engineId} has a next action`);
     assert.ok(engine.integration?.proof, `${engineId} has acceptance proof`);
   }
+
+  const activepieces = capabilitiesResponse.payload.capabilities.find(item => item.id === 'activepieces');
+  assert.equal(activepieces.integration.endpoint, '/api/activepieces-frontdesk-issue');
+
+  const frontdeskInput = {
+    issueId: 'fd-42',
+    title: 'Guest reported leaking pedestal',
+    description: 'Water is pooling near the RV pedestal.',
+    location: 'Site 42',
+    category: 'maintenance',
+    priority: 'high',
+    reportedBy: 'Front Desk'
+  };
+  const firstContract = activepiecesFrontdeskIssue.buildContract(frontdeskInput);
+  const secondContract = activepiecesFrontdeskIssue.buildContract(frontdeskInput);
+  assert.equal(firstContract.contract, activepiecesFrontdeskIssue.CONTRACT);
+  assert.equal(firstContract.workOrder.status, 'queued_for_ops_review');
+  assert.equal(firstContract.workOrder.department, 'Maintenance');
+  assert.equal(firstContract.managerNotification.approvalRequired, true);
+  assert.equal(firstContract.workOrder.dedupeKey, secondContract.workOrder.dedupeKey);
+  assert.ok(firstContract.automationBoundaries.requiresApproval.includes('send SMS, email, push, or Vonage message'));
+  assert.throws(() => activepiecesFrontdeskIssue.buildContract({ description: 'No title' }), /Missing issue title/);
 }
 
 run();
