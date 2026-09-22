@@ -1,59 +1,21 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "functions": {
-    "api/run.js": {
-      "maxDuration": 60,
-      "includeFiles": "{api/**,scripts/**,manifests/**,commands/**,skills/**,agents/**,mclain-app/**,docs/COMMAND-REGISTRY.json,docs/zh-CN/**,.claude-plugin/**,AGENTS.md,README.md,README.zh-CN.md,package.json,vercel.json}"
-    },
-    "api/status.js": {
-      "includeFiles": "{manifests/**,commands/**,skills/**,package.json}"
-    },
-    "api/profile.js": {
-      "includeFiles": "manifests/**"
-    }
-  },
   "rewrites": [
-    {
-      "source": "/",
-      "destination": "/mclain-app/public/index.html"
-    },
-    {
-      "source": "/manifest.webmanifest",
-      "destination": "/mclain-app/public/manifest.webmanifest"
-    },
-    {
-      "source": "/styles.css",
-      "destination": "/mclain-app/public/styles.css"
-    },
-    {
-      "source": "/core.js",
-      "destination": "/mclain-app/public/core.js"
-    },
-    {
-      "source": "/ops-config.js",
-      "destination": "/mclain-app/public/ops-config.js"
-    },
-    {
-      "source": "/app.js",
-      "destination": "/mclain-app/public/app.js"
-    },
-    {
-      "source": "/sw.js",
-      "destination": "/mclain-app/public/sw.js"
-    },
-    {
-      "source": "/icon.svg",
-      "destination": "/mclain-app/public/icon.svg"
-    }
+    { "source": "/api/status", "destination": "/api/ecc-bridge?path=status" },
+    { "source": "/api/profile", "destination": "/api/ecc-bridge?path=profile" },
+    { "source": "/api/capabilities", "destination": "/api/ecc-bridge?path=capabilities" },
+    { "source": "/api/repo-status", "destination": "/api/ecc-bridge?path=repo-status" },
+    { "source": "/api/activepieces-frontdesk-issue", "destination": "/api/ecc-bridge?path=activepieces-frontdesk-issue" },
+    { "source": "/api/run", "destination": "/api/ecc-bridge?path=run" },
+    { "source": "/api/packet", "destination": "/api/ecc-bridge?path=packet" },
+    { "source": "/", "destination": "/index.html" }
   ],
   "headers": [
     {
-      "source": "/sw.js",
+      "source": "/(.*)",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
   ]
